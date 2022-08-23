@@ -103,7 +103,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return _createWillPopScope(_initScaffoldByMain());
+    return initBackgoundImage(_createWillPopScope(_initScaffoldByMain()));
   }
 
   WillPopScope _createWillPopScope(Widget widget) {

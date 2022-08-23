@@ -6,13 +6,26 @@ import 'package:teragate/states/settingwork_state.dart';
 import 'package:teragate/config/env.dart';
 import 'package:teragate/states/login_state.dart';
 
+import 'package:teragate/config/colors.dart';
+import 'package:teragate/config/font-weights.dart';
+import 'package:teragate/config/icons.dart';
+
+import 'package:teragate/states/widgets/setting-uuid.dart';
+import 'package:teragate/states/widgets/card-button.dart';
+
+import 'package:teragate/states/widgets/background.dart';
+import 'package:teragate/states/widgets/navbar.dart';
+import 'package:teragate/states/widgets/text.dart';
+
 class Setting extends StatefulWidget {
   final String uuid;
   final bool? switchGetIn;
   final bool? switchGetOut;
   final bool? switchAlarm;
 
-  const Setting(this.uuid, this.switchGetIn, this.switchGetOut, this.switchAlarm, Key? key) : super(key: key);
+  const Setting(this.uuid, this.switchGetIn, this.switchGetOut,
+      this.switchAlarm, Key? key)
+      : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
@@ -29,7 +42,11 @@ class SettingState extends State<Setting> {
   late TextEditingController uuidContoroller;
   TextStyle style = const TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
-  TextStyle textStyle = const TextStyle(fontWeight: FontWeight.w700, fontFamily: 'suit', color: Colors.white, fontSize: 20);
+  TextStyle textStyle = const TextStyle(
+      fontWeight: FontWeight.w700,
+      fontFamily: 'suit',
+      color: Colors.white,
+      fontSize: 20);
 
   bool switchAlarm = false;
 
@@ -43,7 +60,8 @@ class SettingState extends State<Setting> {
 
   @override
   Widget build(BuildContext context) {
-    return _createContainerByBackground(_initScaffoldByAppbar(_createWillPopScope(_createListView(_initContainerByRadius()))));
+    return _createContainerByBackground(
+        (_createWillPopScope(_initScaffoldByAppbar())));
   }
 
   ListView _createListView(Widget widget) {
@@ -53,7 +71,11 @@ class SettingState extends State<Setting> {
   }
 
   Container _createContainerByBackground(Widget widget) {
-    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/background.png"), fit: BoxFit.fill)), child: widget);
+    return Container(
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("assets/background.png"), fit: BoxFit.fill)),
+        child: widget);
   }
 
   WillPopScope _createWillPopScope(Widget widget) {
@@ -67,7 +89,14 @@ class SettingState extends State<Setting> {
   }
 
   Container _createContainer(Widget widget) {
-    return Container(padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 40), margin: const EdgeInsets.all(8.0), decoration: BoxDecoration(color: const Color(0xff17171C), borderRadius: BorderRadius.circular(10)), child: widget);
+    return Container(
+        padding:
+            const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 40),
+        margin: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+            color: const Color(0xff17171C),
+            borderRadius: BorderRadius.circular(10)),
+        child: widget);
   }
 
   GestureDetector _createGestureDetector(Function callback, Widget widget) {
@@ -83,7 +112,8 @@ class SettingState extends State<Setting> {
     return Visibility(visible: true, child: widget); // 테스트
   }
 
-  SizedBox _initSizedBoxByicon_2Text(AssetImage image, String mainText, String subText) {
+  SizedBox _initSizedBoxByicon_2Text(
+      AssetImage image, String mainText, String subText) {
     return SizedBox(
         child: Row(children: [
       Container(
@@ -96,8 +126,16 @@ class SettingState extends State<Setting> {
         ),
       ),
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(margin: const EdgeInsets.only(bottom: 6), child: Text(mainText, style: textStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w700))),
-        Text(subText, style: textStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w400, color: const Color(0xff7B7D8E))),
+        Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            child: Text(mainText,
+                style: textStyle.copyWith(
+                    fontSize: 18, fontWeight: FontWeight.w700))),
+        Text(subText,
+            style: textStyle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xff7B7D8E))),
       ])
     ]));
   }
@@ -115,12 +153,76 @@ class SettingState extends State<Setting> {
         ),
       ),
       Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Container(margin: const EdgeInsets.only(bottom: 6), child: Text(mainText, style: textStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w700))),
+        Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            child: Text(mainText,
+                style: textStyle.copyWith(
+                    fontSize: 18, fontWeight: FontWeight.w700))),
       ])
     ]));
   }
 
-  Scaffold _initScaffoldByAppbar(Widget widget) {
+  Scaffold _initScaffoldByAppbar() {
+    return Scaffold(
+      appBar: NavBar(
+        title: CustomText(
+          text: "환경설정",
+          size: 20.0,
+          weight: TeragateFontWeight.semiBold,
+        ),
+        isLeading: true,
+        // isActions: true,
+      ),
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: Column(
+          children: [
+            Expanded(
+              child: createContentBox(
+                Column(
+                  children: [
+                    const SettingUUID(),
+                    const SizedBox(height: 10.0),
+                    const CardButton(
+                      icon: TeragateIcons.business,
+                      title: "출근 일정 >",
+                      subtitle: "출근 알림을 설정하세요",
+                      isSwitch: true,
+                    ),
+                    const CardButton(
+                      icon: TeragateIcons.business,
+                      title: "퇴근 일정 >",
+                      subtitle: "퇴근 알림을 설정하세요",
+                      isSwitch: true,
+                    ),
+                    const CardButton(
+                      icon: TeragateIcons.vibration,
+                      title: "알림 진동",
+                      isSwitch: true,
+                    ),
+                    const CardButton(
+                      icon: TeragateIcons.restart,
+                      title: "초기화",
+                    ),
+                    const Expanded(child: Text("")),
+                    CustomText(
+                      text: "현재 버전 v1.2.300",
+                      size: 14,
+                      weight: TeragateFontWeight.regular,
+                      color: TeragateColors.grey,
+                    ),
+                    const SizedBox(height: 20.0),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Scaffold _initScaffoldByAppbar2(Widget widget) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -134,7 +236,9 @@ class SettingState extends State<Setting> {
         ),
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: true,
-        title: Text("Setting", style: textStyle.copyWith(fontWeight: FontWeight.w600, fontSize: 20)),
+        title: Text("Setting",
+            style:
+                textStyle.copyWith(fontWeight: FontWeight.w600, fontSize: 20)),
         actions: const [],
         centerTitle: true,
         elevation: 4,
@@ -147,14 +251,18 @@ class SettingState extends State<Setting> {
   Container _initContainerByRadius() {
     return Container(
       padding: const EdgeInsets.only(top: 15),
-      decoration: const BoxDecoration(color: Color(0xff27282E), borderRadius: BorderRadius.only(topLeft: Radius.circular(30.0), topRight: Radius.circular(30.0))),
+      decoration: const BoxDecoration(
+          color: Color(0xff27282E),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0), topRight: Radius.circular(30.0))),
       child: Column(
         children: <Widget>[
           _initContainerByUuid(),
           _createGestureDetector(_onTapWorkIn, _initContainerByGetIn()),
           _createGestureDetector(_onTapWorkOut, _initContainerByGetOut()),
           _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
-          _createVisibility(_createGestureDetector(onTapInit, _initContainerByInitIos()))
+          _createVisibility(
+              _createGestureDetector(onTapInit, _initContainerByInitIos()))
         ],
       ),
     );
@@ -180,7 +288,12 @@ class SettingState extends State<Setting> {
   // }
 
   TextFormField _initTextFormFieldBytextUUID() {
-    return TextFormField(controller: uuidContoroller, validator: (value) => (value!.isEmpty) ? Env.TITLE_SETTING_UUID_SUB : null, style: textStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w400), decoration: const InputDecoration(border: OutlineInputBorder()));
+    return TextFormField(
+        controller: uuidContoroller,
+        validator: (value) =>
+            (value!.isEmpty) ? Env.TITLE_SETTING_UUID_SUB : null,
+        style: textStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w400),
+        decoration: const InputDecoration(border: OutlineInputBorder()));
   }
 
   Padding _initPaddingByButton(String text) {
@@ -193,10 +306,15 @@ class SettingState extends State<Setting> {
             child: MaterialButton(
                 onPressed: () {
                   setState(() {
-                    uuidContoroller = TextEditingController(text: Env.INITIAL_UUID);
+                    uuidContoroller =
+                        TextEditingController(text: Env.INITIAL_UUID);
                   });
                 },
-                child: Text(text, style: textStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)))));
+                child: Text(text,
+                    style: textStyle.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14)))));
   }
 
   Container _initContainerByUuid() {
@@ -204,17 +322,28 @@ class SettingState extends State<Setting> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         // _initRowByTitle(),
-        _initSizedBoxByicon_1Text(const AssetImage("assets/bluetooth_white_24dp.png"), Env.TITLE_SETTING_UUID),
+        _initSizedBoxByicon_1Text(
+            const AssetImage("assets/bluetooth_white_24dp.png"),
+            Env.TITLE_SETTING_UUID),
         Container(
           margin: const EdgeInsets.only(top: 18, bottom: 10),
           alignment: Alignment.centerLeft,
-          child: Text(Env.TITLE_SETTING_UUID_SUB, style: textStyle.copyWith(color: const Color(0xff9093A5), fontWeight: FontWeight.w400, fontSize: 14)),
+          child: Text(Env.TITLE_SETTING_UUID_SUB,
+              style: textStyle.copyWith(
+                  color: const Color(0xff9093A5),
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14)),
         ),
-        Container(margin: const EdgeInsets.only(top: 10, bottom: 20), color: const Color(0xff27282E), child: _initTextFormFieldBytextUUID()),
+        Container(
+            margin: const EdgeInsets.only(top: 10, bottom: 20),
+            color: const Color(0xff27282E),
+            child: _initTextFormFieldBytextUUID()),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           _initPaddingByButton(Env.TITLE_SETTING_UUID_DEFAULT_BUTTON),
           //Visibility(visible: false, child: _initPaddingByGetUUID())
-          Visibility(visible: true, child: _initPaddingByButton(Env.TITLE_SETTING_UUID_GET_BUTTON))
+          Visibility(
+              visible: true,
+              child: _initPaddingByButton(Env.TITLE_SETTING_UUID_GET_BUTTON))
         ])
         // 테스트
       ],
@@ -222,8 +351,10 @@ class SettingState extends State<Setting> {
   }
 
   Container _initContainerByGetIn() {
-    return _createContainer(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      _initSizedBoxByicon_2Text(const AssetImage("assets/getin_white_24dp.png"), Env.TITLE_SETTING_GET_IN, Env.TITLE_SETTING_GET_IN_SUB),
+    return _createContainer(
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      _initSizedBoxByicon_2Text(const AssetImage("assets/getin_white_24dp.png"),
+          Env.TITLE_SETTING_GET_IN, Env.TITLE_SETTING_GET_IN_SUB),
       FittedBox(
           fit: BoxFit.fill,
           child: Switch(
@@ -241,7 +372,10 @@ class SettingState extends State<Setting> {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _initSizedBoxByicon_2Text(const AssetImage("assets/getout_white_24dp.png"), Env.TITLE_SETTING_GET_OFF, Env.TITLE_SETTING_GET_OFF_SUB),
+        _initSizedBoxByicon_2Text(
+            const AssetImage("assets/getout_white_24dp.png"),
+            Env.TITLE_SETTING_GET_OFF,
+            Env.TITLE_SETTING_GET_OFF_SUB),
         FittedBox(
             fit: BoxFit.fill,
             child: Switch(
@@ -260,7 +394,9 @@ class SettingState extends State<Setting> {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _initSizedBoxByicon_1Text(const AssetImage("assets/volume_up_white_24dp.png"), Env.TITLE_SETTING_ALARM),
+        _initSizedBoxByicon_1Text(
+            const AssetImage("assets/volume_up_white_24dp.png"),
+            Env.TITLE_SETTING_ALARM),
         FittedBox(
             fit: BoxFit.fill,
             child: Switch(
@@ -279,16 +415,22 @@ class SettingState extends State<Setting> {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        _initSizedBoxByicon_1Text(const AssetImage("assets/restart_alt_white_24dp.png"), Env.TITLE_SETTING_INITIALIZATION),
+        _initSizedBoxByicon_1Text(
+            const AssetImage("assets/restart_alt_white_24dp.png"),
+            Env.TITLE_SETTING_INITIALIZATION),
       ],
     ));
   }
 
   Future<void> _onTapWorkIn() async {
-    _getWorkIn().then((data) => Navigator.push(context, MaterialPageRoute(builder: (context) => SettingWorkTime(Env.WORK_GET_IN, data["initSwitchList"], data["initTimeList"], null))));
+    _getWorkIn().then((data) => Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SettingWorkTime(Env.WORK_GET_IN,
+                data["initSwitchList"], data["initTimeList"], null))));
   }
 
-  Future<Map<String, dynamic>> _getWorkIn() async{
+  Future<Map<String, dynamic>> _getWorkIn() async {
     String? timeMon = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
     String? timeTue = await secureStorage.read(Env.KEY_SETTING_TUE_GI_TIME);
     String? timeWed = await secureStorage.read(Env.KEY_SETTING_WED_GI_TIME);
@@ -305,20 +447,37 @@ class SettingState extends State<Setting> {
     String? switchSat = await secureStorage.read(Env.KEY_SETTING_SAT_GI_SWITCH);
     String? switchSun = await secureStorage.read(Env.KEY_SETTING_SUN_GI_SWITCH);
 
-    List<String?> initTimeList = [timeMon, timeTue, timeWed, timeThu, timeFri, timeSat, timeSun];
-    List<String?> initSwitchList = [switchMon, switchTue, switchWed, switchThu, switchFri, switchSat, switchSun];
+    List<String?> initTimeList = [
+      timeMon,
+      timeTue,
+      timeWed,
+      timeThu,
+      timeFri,
+      timeSat,
+      timeSun
+    ];
+    List<String?> initSwitchList = [
+      switchMon,
+      switchTue,
+      switchWed,
+      switchThu,
+      switchFri,
+      switchSat,
+      switchSun
+    ];
 
-    return {
-      "initTimeList": initTimeList,
-      "initSwitchList": initSwitchList
-    };
+    return {"initTimeList": initTimeList, "initSwitchList": initSwitchList};
   }
 
   Future<void> _onTapWorkOut() async {
-    _getWorkOut().then((data) => Navigator.push(context, MaterialPageRoute(builder: (context) => SettingWorkTime(Env.WORK_GET_OUT, data["initSwitchList"], data["initTimeList"], null))));
+    _getWorkOut().then((data) => Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SettingWorkTime(Env.WORK_GET_OUT,
+                data["initSwitchList"], data["initTimeList"], null))));
   }
 
-  Future<Map<String, dynamic>> _getWorkOut() async{
+  Future<Map<String, dynamic>> _getWorkOut() async {
     String? timeMon = await secureStorage.read(Env.KEY_SETTING_MON_GO_TIME);
     String? timeTue = await secureStorage.read(Env.KEY_SETTING_TUE_GO_TIME);
     String? timeWed = await secureStorage.read(Env.KEY_SETTING_WED_GO_TIME);
@@ -335,13 +494,26 @@ class SettingState extends State<Setting> {
     String? switchSat = await secureStorage.read(Env.KEY_SETTING_SAT_GO_SWITCH);
     String? switchSun = await secureStorage.read(Env.KEY_SETTING_SUN_GO_SWITCH);
 
-    List<String?> initTimeList = [timeMon, timeTue, timeWed, timeThu, timeFri, timeSat, timeSun];
-    List<String?> initSwitchList = [switchMon, switchTue, switchWed, switchThu, switchFri, switchSat, switchSun];
+    List<String?> initTimeList = [
+      timeMon,
+      timeTue,
+      timeWed,
+      timeThu,
+      timeFri,
+      timeSat,
+      timeSun
+    ];
+    List<String?> initSwitchList = [
+      switchMon,
+      switchTue,
+      switchWed,
+      switchThu,
+      switchFri,
+      switchSat,
+      switchSun
+    ];
 
-    return {
-      "initTimeList" : initTimeList,
-      "initSwitchList" : initSwitchList
-    };
+    return {"initTimeList": initTimeList, "initSwitchList": initSwitchList};
   }
 
   void onTapAlarm() {
@@ -361,7 +533,8 @@ class SettingState extends State<Setting> {
         builder: (BuildContext context) {
           return AlertDialog(
             // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
             //Dialog Main Title
             title: Column(
               children: const <Widget>[
@@ -404,7 +577,8 @@ class SettingState extends State<Setting> {
     //3. 백버튼 사용은 막혀있으므로 처리할 필요가 없음
 
     secureStorage.deleteAll();
-    await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+    await Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const Login()));
   }
 
   Future<void> _saveValue() async {
