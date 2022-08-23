@@ -6,7 +6,6 @@ import 'package:teragate/services/server_service.dart';
 import 'package:teragate/utils/alarm_util.dart';
 import 'package:teragate/states/login_state.dart';
 import 'package:teragate/states/dashboard_state.dart';
-import 'package:teragate/states/home_state.dart';
 
 void main() {
   runApp(const MyApp());
@@ -91,7 +90,7 @@ class _MyHomePageState extends State<MyHome> {
   void move(String? id, String? password, String? isLogin) async {
     if (isLogin == "true") {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const Home()));
+          context, MaterialPageRoute(builder: (context) => const Dashboard()));
     } else {
       if (id != null && password != null) {
         login(id, password).then((loginInfo) {
@@ -103,7 +102,7 @@ class _MyHomePageState extends State<MyHome> {
             secureStorage.write(
                 Env.KEY_LOGIN_RETURN_ID, loginInfo.data!["userId"].toString());
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => const Home()));
+                context, MaterialPageRoute(builder: (context) => const Dashboard()));
           } else {
             showSnackBar(context, loginInfo.message!);
             Navigator.pushReplacement(context,
