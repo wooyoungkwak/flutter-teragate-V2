@@ -399,9 +399,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         currentLocationState = locationState;
       }
 
-      setState(() {
-        _getLoactionName().then((value) => name = value);
-      });
+      // setState(() {
+      //   _getLoactionName().then((value) => name = value);
+      // });
     });
 
     return timer;
@@ -425,4 +425,5 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String? name = await secureStorage.read(currentUuid!);
     return name;
   }
+
 }
