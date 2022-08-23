@@ -6,6 +6,7 @@ import 'package:teragate/services/server_service.dart';
 import 'package:teragate/utils/alarm_util.dart';
 import 'package:teragate/states/login_state.dart';
 import 'package:teragate/states/dashboard_state.dart';
+import 'package:teragate/states/home_state.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,7 +56,9 @@ class _MyHomePageState extends State<MyHome> {
 
   Container _createContainerByBackground(Widget widget) {
     return Container(
-      decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/background.png"), fit: BoxFit.fill)),
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/background.png"), fit: BoxFit.fill)),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: widget,
@@ -63,13 +66,18 @@ class _MyHomePageState extends State<MyHome> {
     );
   }
 
-  Padding _createPaddingByOnly(double top, double bottom, double left, double right, Widget widget) {
-    return Padding(padding: EdgeInsets.only(top: top, bottom: bottom, left: left, right: right), child: widget);
+  Padding _createPaddingByOnly(
+      double top, double bottom, double left, double right, Widget widget) {
+    return Padding(
+        padding:
+            EdgeInsets.only(top: top, bottom: bottom, left: left, right: right),
+        child: widget);
   }
 
   void initSet() async {
     secureStorage = SecureStorage();
-    _checkUser(context).then((data) => move(data["loginId"], data["loginPw"], data["isLogin"]));
+    _checkUser(context).then(
+        (data) => move(data["loginId"], data["loginPw"], data["isLogin"]));
   }
 
   Future<Map<String, String?>> _checkUser(context) async {
@@ -82,22 +90,29 @@ class _MyHomePageState extends State<MyHome> {
 
   void move(String? id, String? password, String? isLogin) async {
     if (isLogin == "true") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const Home()));
     } else {
       if (id != null && password != null) {
         login(id, password).then((loginInfo) {
           if (loginInfo.success!) {
-            secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
-            secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
-            secureStorage.write(Env.KEY_LOGIN_RETURN_ID, loginInfo.data!["userId"].toString());
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
+            secureStorage.write(Env.KEY_ACCESS_TOKEN,
+                '${loginInfo.tokenInfo?.getAccessToken()}');
+            secureStorage.write(Env.KEY_REFRESH_TOKEN,
+                '${loginInfo.tokenInfo?.getRefreshToken()}');
+            secureStorage.write(
+                Env.KEY_LOGIN_RETURN_ID, loginInfo.data!["userId"].toString());
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => const Home()));
           } else {
             showSnackBar(context, loginInfo.message!);
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const Login()));
           }
         });
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const Login()));
       }
     }
   }

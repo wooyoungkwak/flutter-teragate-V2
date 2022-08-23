@@ -14,6 +14,17 @@ import 'package:move_to_background/move_to_background.dart';
 //현재시간
 import 'package:timer_builder/timer_builder.dart';
 
+import 'package:teragate/config/colors.dart';
+import 'package:teragate/config/font-weights.dart';
+import 'package:teragate/config/icons.dart';
+
+import 'package:teragate/states/widgets/background.dart';
+import 'package:teragate/states/widgets/navbar.dart';
+import 'package:teragate/states/widgets/text.dart';
+import 'package:teragate/states/widgets/card-commuting.dart';
+import 'package:teragate/states/widgets/card-state.dart';
+import 'package:teragate/states/widgets/card-button.dart';
+
 import 'package:teragate/config/env.dart';
 import 'package:teragate/models/storage_model.dart';
 import 'package:teragate/services/network_service.dart';
@@ -121,13 +132,106 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   Scaffold _initScaffoldByMain() {
     return Scaffold(
+      appBar: NavBar(
+        title: Image.asset('assets/logo_02.png', fit: BoxFit.none),
+        isActions: true,
+      ),
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: ListView(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CustomText(
+                  text: "09:23",
+                  size: 60.0,
+                  weight: TeragateFontWeight.bold,
+                ),
+                CustomText(
+                  text: "월요일",
+                  size: 20.0,
+                  weight: TeragateFontWeight.medium,
+                ),
+                CustomText(
+                  text: '2022년 8월 19일',
+                  size: 18.0,
+                  weight: TeragateFontWeight.regular,
+                  color: TeragateColors.grey,
+                ),
+                const SizedBox(
+                  height: 1000.0,
+                ),
+                createContentBox(
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CustomText(
+                        text: "출근 · 퇴근",
+                        size: 20.0,
+                        weight: TeragateFontWeight.bold,
+                        color: TeragateColors.cardTitle,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CardCommuting(
+                              title: "출근",
+                              time: "08:52",
+                              isCommuting: "출근 완료",
+                            ),
+                          ),
+                          Expanded(
+                            child: CardCommuting(
+                              title: "퇴근",
+                              time: "18:02",
+                              isCommuting: "퇴근 완료",
+                            ),
+                          ),
+                        ],
+                      ),
+                      const CardState(),
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: CardButton(
+                              icon: TeragateIcons.groups,
+                              title: "그룹웨어",
+                              subtitle: "HI5 바로가기",
+                            ),
+                          ),
+                          Expanded(
+                            child: CardButton(
+                              icon: Icons.settings,
+                              title: "환경설정",
+                              subtitle: "일정 및 앱 설정",
+                              function: _moveSetting,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Scaffold _initScaffoldByMain2() {
+    return Scaffold(
       appBar: AppBar(
         title: const Text('TERA GATE 출퇴근'),
         automaticallyImplyLeading: false,
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', _moveLogin);
+              showOkCancelDialog(
+                  context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', _moveLogin);
             },
             icon: const Icon(
               Icons.logout_rounded,
@@ -160,7 +264,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
               builder: (context) {
                 return Text(
                   getDateToStringForAllInNow(),
-                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w200),
+                  style: const TextStyle(
+                      fontSize: 30, fontWeight: FontWeight.w200),
                 );
               },
             ),
@@ -221,22 +326,33 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Scaffold _initScaffoldByComuteItem() {
     return Scaffold(
       body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[_createContainer(_createText("이름", name!)), _createContainer(_createText("디바이스 아이피", deviceip!)), _createContainer(_createText("접속시간", getDateToStringForAllInNow())), _createContainer(_createText("영역", currentLocationState!))]),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _createContainer(_createText("이름", name!)),
+            _createContainer(_createText("디바이스 아이피", deviceip!)),
+            _createContainer(_createText("접속시간", getDateToStringForAllInNow())),
+            _createContainer(_createText("영역", currentLocationState!))
+          ]),
     );
   }
 
   // Notifcation 알람 초기화
   Future<void> _initNotification() async {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS = const IOSInitializationSettings(onDidReceiveLocalNotification: null);
-    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettingsAndroid =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS =
+        const IOSInitializationSettings(onDidReceiveLocalNotification: null);
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: null);
   }
 
   void _showNotification(String message) {
-    selectNotificationType(flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
+    selectNotificationType(
+        flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
   }
 
   // ip 설정 ( wifi or mobile (lte, 5G 등 ) )
@@ -255,7 +371,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       }
     });
 
-    connectivityStreamSubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    connectivityStreamSubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile) {
         getIPAddressByMobile().then((map) {
           Log.log(' mobile ip address = ${map["ip"]}');
@@ -286,11 +404,21 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   void _moveWebview(BuildContext context) async {
-    secureStorage.read(Env.KEY_LOGIN_RETURN_ID).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(value!, null))));
+    secureStorage.read(Env.KEY_LOGIN_RETURN_ID).then((value) => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => WebViews(value!, null))));
   }
 
   Future<void> _moveSetting(BuildContext context) async {
-    _getSetting().then((data) => Navigator.push(context, MaterialPageRoute(builder: (context) => Setting(data["beaconuuid"], data["switchGetIn"], data["switchGetOut"], data["switchAlarm"], null))));
+    _getSetting().then((data) => Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Setting(
+                data["beaconuuid"],
+                data["switchGetIn"],
+                data["switchGetOut"],
+                data["switchAlarm"],
+                null))));
   }
 
   Future<Map<String, dynamic>> _getSetting() async {
@@ -303,7 +431,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       // ignore: prefer_if_null_operators
       "beaconuuid": (uuid == null ? Env.UUID_DEFAULT : uuid),
       "switchGetIn": (getin == null ? false : (getin == "true" ? true : false)),
-      "switchGetOut": (getout == null ? false : (getout == "true" ? true : false)),
+      "switchGetOut":
+          (getout == null ? false : (getout == "true" ? true : false)),
       "switchAlarm": (alarm == null ? false : (alarm == "true" ? true : false))
     };
   }
@@ -322,7 +451,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       return;
     }
 
-    processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
+    processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0)
+        .then((workInfo) {
       if (workInfo.success) {
         _showNotification(workInfo.message);
       } else {
@@ -345,7 +475,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       return;
     }
 
-    processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
+    processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0)
+        .then((workInfo) {
       if (workInfo.success) {
         _showNotification(workInfo.message);
       } else {
@@ -393,7 +524,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         locationState = "내부";
       }
 
-      if ( currentLocationState != locationState) {
+      if (currentLocationState != locationState) {
         // 서버에 전송
 
         currentLocationState = locationState;
@@ -425,5 +556,4 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String? name = await secureStorage.read(currentUuid!);
     return name;
   }
-
 }
