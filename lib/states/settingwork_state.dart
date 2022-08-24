@@ -5,6 +5,7 @@ import 'package:teragate/config/env.dart';
 
 import '../utils/time_util.dart';
 
+// deprecate : 사용하지 않음 ...
 class SettingWorkTime extends StatefulWidget {
   final String getstate;
   final List<String?> initSwitchList;

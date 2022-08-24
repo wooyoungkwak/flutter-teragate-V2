@@ -27,14 +27,15 @@ class LoginInfo {
 class WorkInfo {
   bool success;
   String message;
+  int work;
 
-  WorkInfo({required this.success, required this.message});
+  WorkInfo({required this.success, required this.message, required this.work});
 
   static WorkInfo fromJson(Map<String, dynamic> json) {
     if (json["success"]) {
-      return WorkInfo(success: json["success"], message: "");
+      return WorkInfo(success: json["success"], message: "", work:json["work"]);
     } else {
-      return WorkInfo(success: json["success"], message: json["message"] == "exist" ? Env.MSG_GET_IN_EXIST : json["message"]);
+      return WorkInfo(success: json["success"], message: json["message"] == "exist" ? Env.MSG_GET_IN_EXIST : json["message"], work: 0);
     }
   }
 

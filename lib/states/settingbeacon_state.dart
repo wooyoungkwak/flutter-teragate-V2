@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:teragate/config/env.dart';
 import 'package:teragate/models/storage_model.dart';
 
+// deprecate : 사용하지 않음 ...
 class SettingBeacon extends StatefulWidget {
   final String uuid;
   const SettingBeacon(this.uuid, Key? key) : super(key: key);

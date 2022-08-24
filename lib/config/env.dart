@@ -25,6 +25,7 @@ class Env {
   static const String WORK_GET_IN = "getin";
   static const String WORK_GET_OUT = "getout";
 
+  static const String KEY_USER_ID = "USER_ID";  // Login 후에 서버로부터 부여 받은 사용자 ID 값 
   static const String KEY_ID_CHECK = 'KEY_ID_CHECK';
   static const String KEY_LOGIN_SUCCESS = "success";
   static const String KEY_ACCESS_TOKEN = "accessToken";
@@ -32,7 +33,6 @@ class Env {
   static const String KEY_GET_IN_CHECK = "getInCheck";
   static const String KEY_GET_OUT_CHECK = "getOutCheck";
   static const String KEY_LOGIN_STATE = "loginState";
-  static const String KEY_LOGIN_RETURN_ID = "loginReturnID";
   static const String KEY_SETTING_WEEK_GI_SWITCH = "WeekSwitchGi";
   static const String KEY_SETTING_MON_GI_SWITCH = "MondaySwitchGi";
   static const String KEY_SETTING_TUE_GI_SWITCH = "TuesdaySwitchGi";
@@ -83,6 +83,7 @@ class Env {
   static const String MSG_GET_OUT_SUCCESS = "퇴근 등록이 완료 되었습니다.";
   static const String MSG_GET_IN_FAIL = "출근 등록이 실패 하였습니다.";
   static const String MSG_GET_OUT_FAIL = "퇴근 등록이 실패 하였습니다.";
+  static const String MSG_FAIL = "출근 / 퇴근 등록이 실패 하였습니다.";
   static const String MSG_MINOR_FAIL = "비콘이 존재 하지 않습니다. 등록을 실패하였습니다.";
   static const String MSG_LODING = "등록중입니다 ....";
   static const String MSG_PERMISSON_LOCATION = "위치 권한을 항상 허용으로 변경해 주세요.";

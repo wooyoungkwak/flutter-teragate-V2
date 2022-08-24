@@ -234,7 +234,7 @@ class LoginState extends State<Login> {
         secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
         secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
         secureStorage.write(Env.KEY_LOGIN_STATE, "true");
-        secureStorage.write(Env.KEY_LOGIN_RETURN_ID, loginInfo.data!["userId"].toString());
+        secureStorage.write(Env.KEY_USER_ID, loginInfo.data!["userId"].toString());
 
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
       } else {

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:teragate/config/env.dart';
 import 'package:teragate/models/result_model.dart';
+import 'package:teragate/models/beacon_model.dart';
 import 'package:teragate/models/storage_model.dart';
 import 'package:teragate/utils/time_util.dart';
 import 'package:teragate/utils/log_util.dart';
@@ -61,8 +62,41 @@ Future<WorkInfo> _getOut(String ip, String accessToken) async {
   }
 }
 
+// beacon 동기화
+Future<List<BeaconInfoData>> _synchronizeToBeacon(String accessToken, String userId) async {
+  var data = {
+    "userId": userId
+  };
+  var body = json.encode(data);
+  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
+
+  if (response.statusCode == 200) {
+    return BeaconInfoData.fromJsons(json.decode(response.body));
+  } else {
+    throw Exception(response.body);
+  }
+}
+
+// 실시간 추적 정보
+Future<WorkInfo> _tracking(String accessToken, String userId, String ip, String uuid, String location) async {
+  var data = {
+    "attIpIn": ip,
+    "userId" : userId,
+    "uuid" : uuid,
+    "location" : location
+  };
+  var body = json.encode(data);
+  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
+
+  if (response.statusCode == 200) {
+    return WorkInfo.fromJson(json.decode(response.body));
+  } else {
+    throw Exception(response.body);
+  }
+}
+
 // 토큰 재요청
-Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
+Future<TokenInfo> _getTokenByRefreshToken(String refreshToken) async {
   var data = {"refreshToken": refreshToken};
   var body = json.encode(data);
   var response = await http.post(Uri.parse(Env.SERVER_REFRESH_TOKEN_URL), headers: {"Content-Type": "application/json"}, body: body);
@@ -87,7 +121,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
   try {
     if (isGetInCheck != null && isGetInCheck == getDateToStringForYYYYMMDDInNow()) {
       // 출근 처리 가 이미 된 경우
-      workInfo = WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST);
+      workInfo = WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST, work: 0);
     } else {
       workInfo = await _getIn(ip, accessToken);
 
@@ -99,7 +133,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
       } else {
         if (workInfo.message == "expired") {
           // 만료 인 경우 재 요청 경우
-          tokenInfo = await getTokenByRefreshToken(refreshToken);
+          tokenInfo = await _getTokenByRefreshToken(refreshToken);
           // Token 저장
           secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
           secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
@@ -108,7 +142,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
           if (repeat < 2) {
             return await processGetIn(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
           } else {
-            return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL);
+            return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL, work: 0);
           }
         }
       }
@@ -116,7 +150,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
     return workInfo;
   } catch (err) {
     Log.log(" processGetIn Exception : ${err.toString()}");
-    return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL);
+    return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL, work: 0);
   }
 }
 
@@ -133,7 +167,7 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
     } else {
       if (workInfo.message == "expired") {
         // 만료 인 경우 재 요청 경우
-        tokenInfo = await getTokenByRefreshToken(refreshToken);
+        tokenInfo = await _getTokenByRefreshToken(refreshToken);
 
         if (tokenInfo.isUpdated == true) {
           // Token 저장
@@ -145,7 +179,7 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
             return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
           } else {
             Log.log(" ********** token expired ");
-            return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
+            return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL, work: 0);
           }
         }
       }
@@ -153,29 +187,44 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
     return workInfo;
   } catch (err) {
     Log.log(" processGetOut Exception : ${err.toString()}");
-    return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
+    return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL, work: 0);
   }
 }
 
-Future<WorkInfo> processState(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
+// 실시간 추적 처리
+Future<WorkInfo> processTracking(String accessToken, String refreshToken, String userId, String ip, String uuid, String location, SecureStorage secureStorage, int repeat) async {
 
-  DateTime morningTime = DateTime.parse("18:00");
-  DateTime eveningTime = DateTime.parse("18:00");
-  DateTime now = getNow();
+  WorkInfo workInfo = await _tracking(accessToken, userId, ip, uuid, location);
+  TokenInfo tokenInfo;
 
-  int morningDiff = now.difference(morningTime).inSeconds;
-  int eveningDiff = now.difference(eveningTime).inSeconds;
+  try {
+    if (workInfo.success) {
+      tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
+      secureStorage.write(Env.KEY_GET_OUT_CHECK, getDateToStringForAllInNow());
+      workInfo.message = Env.MSG_GET_OUT_SUCCESS;
+    } else {
+      if (workInfo.message == "expired") {
+        // 만료 인 경우 재 요청 경우
+        tokenInfo = await _getTokenByRefreshToken(refreshToken);
 
-  if ( 0< morningDiff && morningDiff < 3600 ) {
-    // 출근
+        if (tokenInfo.isUpdated == true) {
+          // Token 저장
+          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
+          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
 
-  } else if ( 0 < eveningDiff ) {
-    // 퇴근
-
-  } else {
-    // 상태 변화 등록
-
+          repeat++;
+          if (repeat < 2) {
+            return await processTracking(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), userId, ip, uuid, location, secureStorage, repeat);
+          } else {
+            return WorkInfo(success: false, message: Env.MSG_FAIL, work: 0);
+          }
+        }
+      }
+    }
+    return workInfo;
+  } catch (err) {
+    Log.log(" processTracking Exception : ${err.toString()}");
+    return WorkInfo(success: false, message: Env.MSG_FAIL, work: 0);
   }
 
-  return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
 }

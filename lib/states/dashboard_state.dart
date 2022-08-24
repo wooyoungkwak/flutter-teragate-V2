@@ -5,14 +5,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-//플러터 플로팅버튼용
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-
 //Back버튼 기능 변경(종료 > background)
 import 'package:move_to_background/move_to_background.dart';
-
-//현재시간
-import 'package:timer_builder/timer_builder.dart';
 
 import 'package:teragate/config/colors.dart';
 import 'package:teragate/config/font-weights.dart';
@@ -36,6 +30,8 @@ import 'package:teragate/utils/time_util.dart';
 import 'package:teragate/utils/Log_util.dart';
 import 'package:teragate/states/setting_state.dart';
 import 'package:teragate/states/webview_state.dart';
+
+import '../models/result_model.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -65,7 +61,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   String? getInState = "출근 하기";
   String? getInTime = "";
-  
+  String? getOutState = "퇴근 하기";
+  String? getOutTime = "";
 
   late DateTime innerTime;
 
@@ -125,21 +122,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         child: widget);
   }
 
-  Container _createContainer(Widget widget) {
-    return Container(margin: const EdgeInsets.all(8.0), child: widget);
-  }
-
-  Text _createText(String subject, String value) {
-    return Text(
-      "$subject : $value",
-      style: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        color: Colors.blue,
-      ),
-    );
-  }
-
   Scaffold _initScaffoldByMain() {
     return Scaffold(
       appBar: NavBar(
@@ -190,15 +172,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                           Expanded(
                             child: CardCommuting(
                               title: "출근",
-                              time: "$getInTime ",
-                              isCommuting: "$getInState ",
+                              time: "$getInTime",
+                              isCommuting: "$getInState",
                             ),
                           ),
                           Expanded(
                             child: CardCommuting(
                               title: "퇴근",
-                              time: "18:02",
-                              isCommuting: "퇴근 완료",
+                              time: "$getOutTime",
+                              isCommuting: "$getOutState",
                             ),
                           ),
                         ],
@@ -212,12 +194,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                       child: Row(
                         children: [
                           Expanded(
-                            child: CardButton(
-                              icon: TeragateIcons.groups,
-                              title: "그룹웨어",
-                              subtitle: "HI5 바로가기",
-                              function: _moveWebview
-                            ),
+                            child: CardButton(icon: TeragateIcons.groups, title: "그룹웨어", subtitle: "HI5 바로가기", function: _moveWebview),
                           ),
                           Expanded(
                             child: CardButton(
@@ -305,7 +282,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   void _moveWebview(BuildContext context) async {
-    secureStorage.read(Env.KEY_LOGIN_RETURN_ID).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(value!, null))));
+    secureStorage.read(Env.KEY_USER_ID).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(value!, null))));
   }
 
   Future<void> _moveSetting(BuildContext context) async {
@@ -412,19 +389,31 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       if (diff > 60) {
         locationState = "";
         location = "외부";
-        getInState = "출근 하기";
       } else {
         locationState = "근무중";
         location = "사무실";
-        getInState = "출근 완료";
       }
 
       if (currentState != locationState) {
-        // 서버에 전송
-
-        getInTime = getPickerTime(getNow());
         currentState = locationState;
         currentLocation = location;
+
+        // 서버에 전송
+        _sendMessage().then((workInfo) {
+
+          if ( workInfo.message == Env.MSG_FAIL ) {
+            _showNotification(workInfo.message);
+            return;
+          }
+
+          if (workInfo.work == 1) {
+            getInTime = getPickerTime(getNow());
+            getInState = "출근 완료";
+          } else if (workInfo.work == 2) {
+            getOutTime = getPickerTime(getNow());
+            getOutState = "출근 완료";
+          }
+        });
       }
 
       _setUI();
@@ -440,12 +429,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Future<void> _initUuids() async {
     // String? sizeStr = await secureStorage.read(Env.KEY_UUID_SIZE);
     // int size = int.parse(sizeStr!);
-    int size = 0;
 
-    uuids = {};
-    for (int i = 0; i < size; i++) {
-      uuids["$i"] = (await secureStorage.read("uuid$i"))!;
-    }
+    uuids = {
+      "12345678-9A12-3456-789B-123456FFFFFF": "사무실",
+      "74278BDB-B644-4520-8F0C-720EEAFFFFFF": "사무실"
+    };
+
+    // for (int i = 0; i < size; i++) {
+    //   uuids["$i"] = (await secureStorage.read("uuid$i"))!;
+    // }
   }
 
   Future<String?> _getLoactionName() async {
@@ -453,12 +445,21 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     return name;
   }
 
+  Future<WorkInfo> _sendMessage() async {
+    String? acccessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+    String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
+    String? userId = await secureStorage.read(Env.KEY_USER_ID);
+    String uuid = "";
+    String location = "";
+
+    return await processTracking(acccessToken!, refreshToken!, userId!, deviceip!, uuid, location, secureStorage, 0);
+  }
+
   void _setUI() async {
     setState(() {
       currentWeekKor = getWeekByKor();
       currentTime = getDateToStringForHHMMInNow();
       currentDay = getDateToStringForYYYYMMDDKORInNow();
-      // currentState = "";
     });
   }
 }

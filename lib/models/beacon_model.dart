@@ -33,3 +33,25 @@ class BeaconData  {
         'rssi':rssi,
       };
 }
+
+class BeaconInfoData {
+  String location;
+  String uuid;
+
+  BeaconInfoData({required this.uuid, required this.location});
+
+  static BeaconInfoData fromJson(Map<String, dynamic> json) {
+      return BeaconInfoData(location: json["location"], uuid: json["uuid"]);
+  }
+
+  static List<BeaconInfoData> fromJsons(List<dynamic> jsons) {
+    List<BeaconInfoData> beaconInfoDatas = [];
+
+    for (int i=0; i< jsons.length; i++) {
+      beaconInfoDatas.add(BeaconInfoData.fromJson(jsons[i]));
+    }
+
+    return beaconInfoDatas;
+  }
+
+}

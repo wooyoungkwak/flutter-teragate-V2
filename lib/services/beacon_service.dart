@@ -47,7 +47,7 @@ bool checkUUID(Map<String, String> uuids, dynamic event) {
   //   return true;
   // }
 
-  if ( iBeacon.uuid.toUpperCase() ==  "74278bdb-b644-4520-8f0c-720eeaffffff".toUpperCase()) {
+  if ( iBeacon.uuid.toUpperCase() ==  "74278BDB-B644-4520-8F0C-720EEAFFFFFF".toUpperCase()) {
     return true;
   }
 
