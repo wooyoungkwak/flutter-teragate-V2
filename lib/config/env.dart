@@ -1,4 +1,6 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
+import 'package:get/get.dart';
+
 class Env {
   // static const String TEST_SERVER = "http://192.168.0.247";  // local 테스트 서버
   static const String TEST_SERVER = "http://teraenergy.iptime.org"; // 개발 테스트 서버
@@ -133,3 +135,5 @@ class Env {
     TITLE_SETTING_UUID_GET_BUTTON = "UUID 가져오기";
   }
 }
+
+List<String> TEST_LIST_UUID = <String>[].obs;

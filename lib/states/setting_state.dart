@@ -1,5 +1,7 @@
 // import 'package:flutter/gestures.dart';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:teragate/models/storage_model.dart';
 import 'package:teragate/states/settingwork_state.dart';
@@ -9,13 +11,15 @@ import 'package:teragate/states/login_state.dart';
 import 'package:teragate/config/colors.dart';
 import 'package:teragate/config/font-weights.dart';
 import 'package:teragate/config/icons.dart';
+import 'package:teragate/states/mapinguuid.dart';
 
-import 'package:teragate/states/widgets/setting_uuid.dart';
+import 'package:teragate/states/widgets/card-boxbtn.dart';
 import 'package:teragate/states/widgets/card_button.dart';
 
 import 'package:teragate/states/widgets/background.dart';
 import 'package:teragate/states/widgets/navbar.dart';
 import 'package:teragate/states/widgets/text.dart';
+import 'package:teragate/utils/log_util.dart';
 
 class Setting extends StatefulWidget {
   final String uuid;
@@ -49,6 +53,7 @@ class SettingState extends State<Setting> {
       fontSize: 20);
 
   bool switchAlarm = false;
+  final Controller c = Get.put(Controller());
 
   @override
   void initState() {
@@ -61,7 +66,38 @@ class SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     return _createContainerByBackground(
-        (_createWillPopScope(_initScaffoldByAppbar())));
+        (_initScaffoldByAppbar(_createWillPopScope(_initContainerByRadius()))));
+  }
+
+  Container _initContainerByRadius() {
+    return Container(
+        padding: const EdgeInsets.only(top: 15),
+        decoration: const BoxDecoration(
+            color: Color(0xff27282E),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30.0),
+                topRight: Radius.circular(30.0))),
+        child: Column(children: [
+          Obx(() => Text("Clicks: ${c.mapUUID}")),
+          SizedBox(
+              child: CreateContainerByCardbtn(
+                  icon: TeragateIcons.business,
+                  title: "UUID",
+                  btntext: "UUID 가져오기",
+                  function: testlistadd)),
+          SizedBox(height: 10.0),
+          Flexible(child: _initListView()),
+        ]));
+  }
+
+  void testlistadd() {
+    setState(() {
+      Log.debug("버튼클릭 됨");
+      TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
+      TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
+      TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
+      TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
+    });
   }
 
   ListView _createListView(Widget widget) {
@@ -162,64 +198,35 @@ class SettingState extends State<Setting> {
     ]));
   }
 
-  Scaffold _initScaffoldByAppbar() {
+  Scaffold _initScaffoldByAppbar(Widget widget) {
     return Scaffold(
-      appBar: NavBar(
-        title: CustomText(
-          text: "환경설정",
-          size: 20.0,
-          weight: TeragateFontWeight.semiBold,
+        appBar: NavBar(
+          title: CustomText(
+            text: "환경설정",
+            size: 20.0,
+            weight: TeragateFontWeight.semiBold,
+          ),
+          isLeading: true,
+          // isActions: true,
         ),
-        isLeading: true,
-        // isActions: true,
-      ),
-      backgroundColor: Colors.transparent,
-      body: Center(
-        child: Column(
-          children: [
-            Expanded(
-              child: createContentBox(
-                Column(
-                  children: [
-                    const SettingUUID(),
-                    const SizedBox(height: 10.0),
-                    const CardButton(
-                      icon: TeragateIcons.business,
-                      title: "출근 일정 >",
-                      subtitle: "출근 알림을 설정하세요",
-                      isSwitch: true,
-                    ),
-                    const CardButton(
-                      icon: TeragateIcons.business,
-                      title: "퇴근 일정 >",
-                      subtitle: "퇴근 알림을 설정하세요",
-                      isSwitch: true,
-                    ),
-                    const CardButton(
-                      icon: TeragateIcons.vibration,
-                      title: "알림 진동",
-                      isSwitch: true,
-                    ),
-                    const CardButton(
-                      icon: TeragateIcons.restart,
-                      title: "초기화",
-                    ),
-                    const Expanded(child: Text("")),
-                    CustomText(
-                      text: "현재 버전 v1.2.300",
-                      size: 14,
-                      weight: TeragateFontWeight.regular,
-                      color: TeragateColors.grey,
-                    ),
-                    const SizedBox(height: 20.0),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+        backgroundColor: Colors.transparent,
+        body: widget);
+  }
+
+  ListView _initListView() {
+    return ListView.builder(
+        shrinkWrap: true,
+        padding: const EdgeInsets.only(top: 18, bottom: 50),
+        itemCount: c.mapUUID.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Expanded(
+            child: CardButton(
+                icon: TeragateIcons.business,
+                title: " UUID ",
+                subtitle: TEST_LIST_UUID[index],
+                isSwitch: false),
+          );
+        });
   }
 
   Scaffold _initScaffoldByAppbar2(Widget widget) {
@@ -248,7 +255,7 @@ class SettingState extends State<Setting> {
     );
   }
 
-  Container _initContainerByRadius() {
+  Container _initContainerByRadius1() {
     return Container(
       padding: const EdgeInsets.only(top: 15),
       decoration: const BoxDecoration(
