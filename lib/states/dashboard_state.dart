@@ -59,10 +59,13 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   String? currentState = "근무중";
   String? currentLocation = "사무실";
-  String? getInState = "출근 하기";
   String currentWeekKor = "월요일";
   String currentTime = "00:00";
   String currentDay = "1978-01-01";
+
+  String? getInState = "출근 하기";
+  String? getInTime = "";
+  
 
   late DateTime innerTime;
 
@@ -187,8 +190,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                           Expanded(
                             child: CardCommuting(
                               title: "출근",
-                              time: "08:52",
-                              isCommuting: "출근 완료",
+                              time: "$getInTime ",
+                              isCommuting: "$getInState ",
                             ),
                           ),
                           Expanded(
@@ -419,6 +422,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       if (currentState != locationState) {
         // 서버에 전송
 
+        getInTime = getPickerTime(getNow());
         currentState = locationState;
         currentLocation = location;
       }
