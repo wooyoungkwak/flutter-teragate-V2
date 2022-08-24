@@ -59,8 +59,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   String currentTime = "00:00";
   String currentDay = "1978-01-01";
 
-  String? getInTime = "";
-  String? getOutTime = "";
   bool? getInState = false;
   bool? getOutState = false;
 
@@ -185,22 +183,14 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                       ),
                     ),
                     const SizedBox(height: 5.0),
-                    Expanded(
-                        flex: 5,
-                        child: CardState(
-                            locationState: currentState,
-                            location: currentLocation)),
+                    Expanded(flex: 5, child: CardState(locationState: currentState, location: currentLocation)),
                     const SizedBox(height: 5.0),
                     Expanded(
                       flex: 3,
                       child: Row(
                         children: [
                           Expanded(
-                            child: CardButton(
-                                icon: TeragateIcons.groups,
-                                title: "그룹웨어",
-                                subtitle: "HI5 바로가기",
-                                function: _moveWebview),
+                            child: CardButton(icon: TeragateIcons.groups, title: "그룹웨어", subtitle: "HI5 바로가기", function: _moveWebview),
                           ),
                           Expanded(
                             child: CardButton(
@@ -226,20 +216,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   // Notifcation 알람 초기화
   Future<void> _initNotification() async {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid =
-        const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS =
-        const IOSInitializationSettings(onDidReceiveLocalNotification: null);
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = const IOSInitializationSettings(onDidReceiveLocalNotification: null);
+    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: null);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
   }
 
   void _showNotification(String message) {
-    selectNotificationType(
-        flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
+    selectNotificationType(flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
   }
 
   // ip 설정 ( wifi or mobile (lte, 5G 등 ) )
@@ -258,9 +243,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       }
     });
 
-    connectivityStreamSubscription = Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult result) {
+    connectivityStreamSubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile) {
         getIPAddressByMobile().then((map) {
           Log.log(' mobile ip address = ${map["ip"]}');
@@ -295,20 +278,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   void _moveWebview(BuildContext context) async {
-    secureStorage.read(Env.KEY_USER_ID).then((value) => Navigator.push(context,
-        MaterialPageRoute(builder: (context) => WebViews(value!, null))));
+    secureStorage.read(Env.KEY_USER_ID).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(value!, null))));
   }
 
   Future<void> _moveSetting(BuildContext context) async {
-    _getSetting().then((data) => Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => Setting(
-                data["beaconuuid"],
-                data["switchGetIn"],
-                data["switchGetOut"],
-                data["switchAlarm"],
-                null))));
+    _getSetting().then((data) => Navigator.push(context, MaterialPageRoute(builder: (context) => Setting(data["beaconuuid"], data["switchGetIn"], data["switchGetOut"], data["switchAlarm"], null))));
   }
 
   Future<Map<String, dynamic>> _getSetting() async {
@@ -321,8 +295,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       // ignore: prefer_if_null_operators
       "beaconuuid": (uuid == null ? Env.UUID_DEFAULT : uuid),
       "switchGetIn": (getin == null ? false : (getin == "true" ? true : false)),
-      "switchGetOut":
-          (getout == null ? false : (getout == "true" ? true : false)),
+      "switchGetOut": (getout == null ? false : (getout == "true" ? true : false)),
       "switchAlarm": (alarm == null ? false : (alarm == "true" ? true : false))
     };
   }
@@ -341,8 +314,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       return;
     }
 
-    processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0)
-        .then((workInfo) {
+    processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
         _showNotification(workInfo.message);
       } else {
@@ -365,8 +337,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       return;
     }
 
-    processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0)
-        .then((workInfo) {
+    processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
         _showNotification(workInfo.message);
       } else {
@@ -431,10 +402,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           }
 
           if (workInfo.work == 1) {
-            getInTime = getPickerTime(getNow());
             getInState = true;
           } else if (workInfo.work == 2) {
-            getOutTime = getPickerTime(getNow());
             getOutState = true;
           }
         });
@@ -454,10 +423,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     // String? sizeStr = await secureStorage.read(Env.KEY_UUID_SIZE);
     // int size = int.parse(sizeStr!);
 
-    uuids = {
-      "12345678-9A12-3456-789B-123456FFFFFF": "사무실",
-      "74278BDB-B644-4520-8F0C-720EEAFFFFFF": "사무실"
-    };
+    uuids = {"12345678-9A12-3456-789B-123456FFFFFF": "사무실", "74278BDB-B644-4520-8F0C-720EEAFFFFFF": "사무실"};
 
     // for (int i = 0; i < size; i++) {
     //   uuids["$i"] = (await secureStorage.read("uuid$i"))!;
@@ -473,11 +439,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String? acccessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
     String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
     String? userId = await secureStorage.read(Env.KEY_USER_ID);
+
     String uuid = "";
     String location = "";
 
-    return await processTracking(acccessToken!, refreshToken!, userId!,
-        deviceip!, uuid, location, secureStorage, 0);
+    return await processTracking(acccessToken!, refreshToken!, userId!, deviceip!, uuid, location, secureStorage, 0);
   }
 
   void _setUI() async {
