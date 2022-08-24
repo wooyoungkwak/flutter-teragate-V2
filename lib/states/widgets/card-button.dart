@@ -53,6 +53,7 @@ class _CardButtonState extends State<CardButton> {
             margin: const EdgeInsets.only(left: 1.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomText(
                   text: widget.title!,

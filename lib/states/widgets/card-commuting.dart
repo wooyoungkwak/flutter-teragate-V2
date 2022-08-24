@@ -23,36 +23,47 @@ class CardCommuting extends StatelessWidget {
       widget: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CustomText(
-            text: title!,
-            size: 22.0,
-            weight: TeragateFontWeight.semiBold,
-            color: TeragateColors.cardTitle,
-          ),
-          CustomText(
-            text: time!,
-            size: 28.0,
-            weight: TeragateFontWeight.bold,
-            color: TeragateColors.white,
-          ),
-          TextButton(
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  TeragateColors.blue,
+          Expanded(
+            flex: 2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CustomText(
+                  text: title!,
+                  size: 22.0,
+                  weight: TeragateFontWeight.semiBold,
+                  color: TeragateColors.cardTitle,
                 ),
-                minimumSize: MaterialStateProperty.all(
-                  const Size.fromHeight(50),
+                CustomText(
+                  text: time!,
+                  size: 28.0,
+                  weight: TeragateFontWeight.bold,
+                  color: TeragateColors.white,
                 ),
-                shape: MaterialStateProperty.all(
-                  const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(10.0),
-                          bottomRight: Radius.circular(10.0))),
-                )),
-            onPressed: () {},
-            child: CustomText(
-              text: isCommuting!,
-              weight: TeragateFontWeight.semiBold,
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: TextButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    TeragateColors.blue,
+                  ),
+                  minimumSize: MaterialStateProperty.all(
+                    const Size.fromHeight(25),
+                  ),
+                  shape: MaterialStateProperty.all(
+                    const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10.0),
+                            bottomRight: Radius.circular(10.0))),
+                  )),
+              onPressed: () {},
+              child: CustomText(
+                text: isCommuting!,
+                weight: TeragateFontWeight.semiBold,
+              ),
             ),
           ),
         ],

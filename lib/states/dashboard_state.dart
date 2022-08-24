@@ -137,43 +137,44 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         isActions: true,
       ),
       backgroundColor: Colors.transparent,
-      body: Center(
-        child: ListView(
+      body: SizedBox(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CustomText(
-                  text: "09:23",
-                  size: 60.0,
-                  weight: TeragateFontWeight.bold,
-                ),
-                CustomText(
-                  text: "월요일",
-                  size: 20.0,
-                  weight: TeragateFontWeight.medium,
-                ),
-                CustomText(
-                  text: '2022년 8월 19일',
-                  size: 18.0,
-                  weight: TeragateFontWeight.regular,
-                  color: TeragateColors.grey,
-                ),
-                const SizedBox(
-                  height: 1000.0,
-                ),
-                createContentBox(
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CustomText(
-                        text: "출근 · 퇴근",
-                        size: 20.0,
-                        weight: TeragateFontWeight.bold,
-                        color: TeragateColors.cardTitle,
-                      ),
-                      Row(
+            CustomText(
+              text: "09:23",
+              size: 60.0,
+              weight: TeragateFontWeight.bold,
+            ),
+            CustomText(
+              text: "월요일",
+              size: 20.0,
+              weight: TeragateFontWeight.medium,
+            ),
+            CustomText(
+              text: '2022년 8월 19일',
+              size: 18.0,
+              weight: TeragateFontWeight.regular,
+              color: TeragateColors.grey,
+            ),
+            const SizedBox(height: 30.0),
+            Expanded(
+              child: createContentBox(
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // 1
+                    CustomText(
+                      text: "출근 · 퇴근",
+                      size: 20.0,
+                      weight: TeragateFontWeight.bold,
+                      color: TeragateColors.cardTitle,
+                    ),
+                    const SizedBox(height: 10.0),
+                    Expanded(
+                      flex: 4,
+                      child: Row(
                         children: [
                           Expanded(
                             child: CardCommuting(
@@ -191,8 +192,13 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                           ),
                         ],
                       ),
-                      const CardState(),
-                      Row(
+                    ),
+                    const SizedBox(height: 5.0),
+                    const Expanded(flex: 5, child: CardState()),
+                    const SizedBox(height: 5.0),
+                    Expanded(
+                      flex: 3,
+                      child: Row(
                         children: [
                           const Expanded(
                             child: CardButton(
@@ -210,11 +216,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                             ),
                           ),
                         ],
-                      )
-                    ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),
