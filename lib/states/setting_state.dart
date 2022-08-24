@@ -1,7 +1,5 @@
 // import 'package:flutter/gestures.dart';
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 // import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:teragate/models/storage_model.dart';
 import 'package:teragate/states/settingwork_state.dart';
@@ -11,9 +9,8 @@ import 'package:teragate/states/login_state.dart';
 import 'package:teragate/config/colors.dart';
 import 'package:teragate/config/font-weights.dart';
 import 'package:teragate/config/icons.dart';
-import 'package:teragate/states/mapinguuid.dart';
 
-import 'package:teragate/states/widgets/card-boxbtn.dart';
+import 'package:teragate/states/widgets/card_boxbtn.dart';
 import 'package:teragate/states/widgets/card_button.dart';
 
 import 'package:teragate/states/widgets/background.dart';
@@ -53,7 +50,8 @@ class SettingState extends State<Setting> {
       fontSize: 20);
 
   bool switchAlarm = false;
-  final Controller c = Get.put(Controller());
+  //테스트용 UUID 변경 필요
+  List<String> TEST_LIST_UUID = [];
 
   @override
   void initState() {
@@ -78,21 +76,23 @@ class SettingState extends State<Setting> {
                 topLeft: Radius.circular(30.0),
                 topRight: Radius.circular(30.0))),
         child: Column(children: [
-          Obx(() => Text("Clicks: ${c.mapUUID}")),
           SizedBox(
               child: CreateContainerByCardbtn(
                   icon: TeragateIcons.business,
                   title: "UUID",
                   btntext: "UUID 가져오기",
-                  function: testlistadd)),
+                  function: getServeruuid)),
           SizedBox(height: 10.0),
           Flexible(child: _initListView()),
         ]));
   }
 
-  void testlistadd() {
+  void getServeruuid() {
+    //서버에서 가져오는 기능 넣어야됨
+    //가져오기 값에서 다시 변경
+    //GetX를 이용해서 처리 해야됨;;
     setState(() {
-      Log.debug("버튼클릭 됨");
+      TEST_LIST_UUID.clear();
       TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
       TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
       TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
@@ -217,7 +217,7 @@ class SettingState extends State<Setting> {
     return ListView.builder(
         shrinkWrap: true,
         padding: const EdgeInsets.only(top: 18, bottom: 50),
-        itemCount: c.mapUUID.length,
+        itemCount: TEST_LIST_UUID.length,
         itemBuilder: (BuildContext context, int index) {
           return Expanded(
             child: CardButton(
