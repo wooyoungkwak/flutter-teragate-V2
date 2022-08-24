@@ -8,8 +8,10 @@ class Env {
 
   static const String SERVER_LOGIN_URL = '$SERVER_URL:3000/login';
   static const String SERVER_GET_IN_URL = '$SERVER_URL:3000/teragate/goToWork';
-  static const String SERVER_GET_OUT_URL = '$SERVER_URL:3000/teragate/leaveWork';
-  static const String SERVER_REFRESH_TOKEN_URL = '$SERVER_URL:3000/teragate/refreshToken';
+  static const String SERVER_GET_OUT_URL =
+      '$SERVER_URL:3000/teragate/leaveWork';
+  static const String SERVER_REFRESH_TOKEN_URL =
+      '$SERVER_URL:3000/teragate/refreshToken';
 
   static const String INITIAL_UUID = '74278bdb-b644-4520-8f0c-720eeaffffff';
 
@@ -25,7 +27,7 @@ class Env {
   static const String WORK_GET_IN = "getin";
   static const String WORK_GET_OUT = "getout";
 
-  static const String KEY_USER_ID = "USER_ID";  // Login 후에 서버로부터 부여 받은 사용자 ID 값 
+  static const String KEY_USER_ID = "USER_ID"; // Login 후에 서버로부터 부여 받은 사용자 ID 값
   static const String KEY_ID_CHECK = 'KEY_ID_CHECK';
   static const String KEY_LOGIN_SUCCESS = "success";
   static const String KEY_ACCESS_TOKEN = "accessToken";
@@ -92,6 +94,10 @@ class Env {
   static const String TITLE_PERMISSION = "권한 허용";
   static const String TITLE_DIALOG = "알림";
 
+  static const String CARD_COMMUTING_WORK_ON = "출근 완료";
+  static const String CARD_COMMUTING_WORK_OFF = "출근 하기";
+  static const String CARD_COMMUTING_LEAVE_ON = "퇴근 완료";
+  static const String CARD_COMMUTING_LEAVE_OFF = "퇴근 하기";
   static const String CARD_STATE = "상태";
   static const String CARD_STATE_LOCATION = "현재 위치";
 

@@ -5,17 +5,18 @@ import 'package:teragate/config/font-weights.dart';
 
 import 'package:teragate/states/widgets/card_square.dart';
 import 'package:teragate/states/widgets/text.dart';
+import 'package:teragate/utils/log_util.dart';
+import 'package:teragate/utils/time_util.dart';
 
 class CardCommuting extends StatelessWidget {
   final String? title;
-  final String? time;
-  final String? isCommuting;
+  final bool? isCommuting;
 
-  CardCommuting({
+  const CardCommuting({
+    Key? key,
     this.title,
-    this.time,
-    this.isCommuting,
-  });
+    this.isCommuting = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +35,19 @@ class CardCommuting extends StatelessWidget {
                   weight: TeragateFontWeight.semiBold,
                   color: TeragateColors.cardTitle,
                 ),
-                CustomText(
-                  text: time!,
-                  size: 28.0,
-                  weight: TeragateFontWeight.bold,
-                  color: TeragateColors.white,
-                ),
+                isCommuting!
+                    ? CustomText(
+                        text: getPickerTime(getNow()),
+                        size: 28.0,
+                        weight: TeragateFontWeight.bold,
+                        color: TeragateColors.white,
+                      )
+                    : CustomText(
+                        text: "아직 $title 전입니다.",
+                        size: 16.0,
+                        weight: TeragateFontWeight.bold,
+                        color: TeragateColors.grey,
+                      ),
               ],
             ),
           ),
@@ -48,7 +56,9 @@ class CardCommuting extends StatelessWidget {
             child: TextButton(
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
-                    TeragateColors.blue,
+                    isCommuting!
+                        ? TeragateColors.blue
+                        : TeragateColors.inactiveTextColor,
                   ),
                   minimumSize: MaterialStateProperty.all(
                     const Size.fromHeight(25),
@@ -60,9 +70,23 @@ class CardCommuting extends StatelessWidget {
                             bottomRight: Radius.circular(10.0))),
                   )),
               onPressed: () {},
-              child: CustomText(
-                text: isCommuting!,
-                weight: TeragateFontWeight.semiBold,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isCommuting!) const SizedBox(width: 10.0),
+                  CustomText(
+                    text: isCommuting! ? "$title 완료" : "$title 하기",
+                    weight: TeragateFontWeight.semiBold,
+                  ),
+                  if (isCommuting!)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 2.0),
+                      child: Icon(
+                        Icons.done,
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
