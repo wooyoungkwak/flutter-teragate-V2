@@ -91,6 +91,9 @@ class Env {
   static const String TITLE_PERMISSION = "권한 허용";
   static const String TITLE_DIALOG = "알림";
 
+  static const String CARD_STATE = "상태";
+  static const String CARD_STATE_LOCATION = "현재 위치";
+
   static const String UUID_DEFAULT = "74278BDB-B644-4520-8F0C-720EEAFFFFFF";
 
   static const String NOTIFICATION_CHANNEL_ID = "channelID";

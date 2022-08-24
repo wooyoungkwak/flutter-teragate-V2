@@ -21,9 +21,9 @@ import 'package:teragate/config/icons.dart';
 import 'package:teragate/states/widgets/background.dart';
 import 'package:teragate/states/widgets/navbar.dart';
 import 'package:teragate/states/widgets/text.dart';
-import 'package:teragate/states/widgets/card-commuting.dart';
-import 'package:teragate/states/widgets/card-state.dart';
-import 'package:teragate/states/widgets/card-button.dart';
+import 'package:teragate/states/widgets/card_commuting.dart';
+import 'package:teragate/states/widgets/card_state.dart';
+import 'package:teragate/states/widgets/card_button.dart';
 
 import 'package:teragate/config/env.dart';
 import 'package:teragate/models/storage_model.dart';
@@ -56,6 +56,13 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   late StreamSubscription connectivityStreamSubscription;
   late StreamSubscription beaconStreamSubscription;
   late StreamController<String> beaconStreamController;
+
+  String? currentState = "근무중";
+  String? currentLocation = "사무실";
+  String? getInState = "출근 하기";
+  String currentWeekKor = "월요일";
+  String currentTime = "00:00";
+  String currentDay = "1978-01-01";
 
   late DateTime innerTime;
 
@@ -135,6 +142,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       appBar: NavBar(
         title: Image.asset('assets/logo_02.png', fit: BoxFit.none),
         isActions: true,
+        moveLogin: _checkMoveLogin,
       ),
       backgroundColor: Colors.transparent,
       body: SizedBox(
@@ -142,17 +150,17 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CustomText(
-              text: "09:23",
+              text: currentTime,
               size: 60.0,
               weight: TeragateFontWeight.bold,
             ),
             CustomText(
-              text: "월요일",
+              text: currentWeekKor,
               size: 20.0,
               weight: TeragateFontWeight.medium,
             ),
             CustomText(
-              text: '2022년 8월 19일',
+              text: currentDay,
               size: 18.0,
               weight: TeragateFontWeight.regular,
               color: TeragateColors.grey,
@@ -194,17 +202,18 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                       ),
                     ),
                     const SizedBox(height: 5.0),
-                    const Expanded(flex: 5, child: CardState()),
+                    Expanded(flex: 5, child: CardState(locationState: currentState, location: currentLocation)),
                     const SizedBox(height: 5.0),
                     Expanded(
                       flex: 3,
                       child: Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: CardButton(
                               icon: TeragateIcons.groups,
                               title: "그룹웨어",
                               subtitle: "HI5 바로가기",
+                              function: _moveWebview
                             ),
                           ),
                           Expanded(
@@ -228,137 +237,18 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     );
   }
 
-  Scaffold _initScaffoldByMain2() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('TERA GATE 출퇴근'),
-        automaticallyImplyLeading: false,
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              showOkCancelDialog(
-                  context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', _moveLogin);
-            },
-            icon: const Icon(
-              Icons.logout_rounded,
-            ),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.all(8.0),
-              child: const Text(
-                "근태 확인",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.blue,
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20.0,
-            ),
-            Expanded(child: _initScaffoldByComuteItem()), // 변경 ui 출력 테스트
-            TimerBuilder.periodic(
-              const Duration(seconds: 1),
-              builder: (context) {
-                return Text(
-                  getDateToStringForAllInNow(),
-                  style: const TextStyle(
-                      fontSize: 30, fontWeight: FontWeight.w200),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-
-      //플로팅 버튼 추가하기. - 해당 버튼 변경시키기.
-      floatingActionButton: SpeedDial(
-        animatedIcon: AnimatedIcons.menu_close,
-        backgroundColor: Colors.redAccent,
-        overlayColor: Colors.grey,
-        overlayOpacity: 0.5,
-        closeManually: false,
-        children: [
-          SpeedDialChild(
-              child: const Icon(Icons.copy),
-              label: '시작',
-              onTap: () async {
-                _startListenByBeacon();
-              }),
-          SpeedDialChild(
-              child: const Icon(Icons.copy),
-              label: '정지',
-              onTap: () async {
-                _stopListenByBeacon();
-              }),
-          SpeedDialChild(
-              child: const Icon(Icons.copy),
-              label: '출근',
-              // backgroundColor: Colors.blue,
-              onTap: () async {
-                _startToGetIn();
-              }),
-          SpeedDialChild(
-              child: const Icon(Icons.copy),
-              label: '퇴근',
-              onTap: () async {
-                _startToGetOut();
-              }),
-          SpeedDialChild(
-              child: const Icon(Icons.copy),
-              label: '그룹웨어',
-              onTap: () async {
-                _moveWebview(context);
-              }),
-          SpeedDialChild(
-              child: const Icon(Icons.copy),
-              label: '환경설정',
-              onTap: () async {
-                await _moveSetting(context);
-              })
-        ],
-      ),
-    );
-  }
-
-  Scaffold _initScaffoldByComuteItem() {
-    return Scaffold(
-      body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _createContainer(_createText("이름", name!)),
-            _createContainer(_createText("디바이스 아이피", deviceip!)),
-            _createContainer(_createText("접속시간", getDateToStringForAllInNow())),
-            _createContainer(_createText("영역", currentLocationState!))
-          ]),
-    );
-  }
-
   // Notifcation 알람 초기화
   Future<void> _initNotification() async {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid =
-        const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS =
-        const IOSInitializationSettings(onDidReceiveLocalNotification: null);
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = const IOSInitializationSettings(onDidReceiveLocalNotification: null);
+    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: null);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
   }
 
   void _showNotification(String message) {
-    selectNotificationType(
-        flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
+    selectNotificationType(flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
   }
 
   // ip 설정 ( wifi or mobile (lte, 5G 등 ) )
@@ -377,9 +267,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       }
     });
 
-    connectivityStreamSubscription = Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult result) {
+    connectivityStreamSubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile) {
         getIPAddressByMobile().then((map) {
           Log.log(' mobile ip address = ${map["ip"]}');
@@ -392,6 +280,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         });
       }
     });
+  }
+
+  void _checkMoveLogin() {
+    showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', _moveLogin);
   }
 
   void _moveLogin() async {
@@ -410,21 +302,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   void _moveWebview(BuildContext context) async {
-    secureStorage.read(Env.KEY_LOGIN_RETURN_ID).then((value) => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => WebViews(value!, null))));
+    secureStorage.read(Env.KEY_LOGIN_RETURN_ID).then((value) => Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(value!, null))));
   }
 
   Future<void> _moveSetting(BuildContext context) async {
-    _getSetting().then((data) => Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => Setting(
-                data["beaconuuid"],
-                data["switchGetIn"],
-                data["switchGetOut"],
-                data["switchAlarm"],
-                null))));
+    _getSetting().then((data) => Navigator.push(context, MaterialPageRoute(builder: (context) => Setting(data["beaconuuid"], data["switchGetIn"], data["switchGetOut"], data["switchAlarm"], null))));
   }
 
   Future<Map<String, dynamic>> _getSetting() async {
@@ -437,8 +319,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       // ignore: prefer_if_null_operators
       "beaconuuid": (uuid == null ? Env.UUID_DEFAULT : uuid),
       "switchGetIn": (getin == null ? false : (getin == "true" ? true : false)),
-      "switchGetOut":
-          (getout == null ? false : (getout == "true" ? true : false)),
+      "switchGetOut": (getout == null ? false : (getout == "true" ? true : false)),
       "switchAlarm": (alarm == null ? false : (alarm == "true" ? true : false))
     };
   }
@@ -457,8 +338,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       return;
     }
 
-    processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0)
-        .then((workInfo) {
+    processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
         _showNotification(workInfo.message);
       } else {
@@ -481,8 +361,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       return;
     }
 
-    processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0)
-        .then((workInfo) {
+    processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
         _showNotification(workInfo.message);
       } else {
@@ -523,22 +402,28 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       if (innerTime == null) return;
 
       int diff = getNow().difference(innerTime).inSeconds;
+
       String locationState = "";
+      String location = "";
+
       if (diff > 60) {
-        locationState = "외부";
+        locationState = "";
+        location = "외부";
+        getInState = "출근 하기";
       } else {
-        locationState = "내부";
+        locationState = "근무중";
+        location = "사무실";
+        getInState = "출근 완료";
       }
 
-      if (currentLocationState != locationState) {
+      if (currentState != locationState) {
         // 서버에 전송
 
-        currentLocationState = locationState;
+        currentState = locationState;
+        currentLocation = location;
       }
 
-      // setState(() {
-      //   _getLoactionName().then((value) => name = value);
-      // });
+      _setUI();
     });
 
     return timer;
@@ -549,8 +434,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   Future<void> _initUuids() async {
-    String? sizeStr = await secureStorage.read(Env.KEY_UUID_SIZE);
-    int size = int.parse(sizeStr!);
+    // String? sizeStr = await secureStorage.read(Env.KEY_UUID_SIZE);
+    // int size = int.parse(sizeStr!);
+    int size = 0;
 
     uuids = {};
     for (int i = 0; i < size; i++) {
@@ -561,5 +447,14 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Future<String?> _getLoactionName() async {
     String? name = await secureStorage.read(currentUuid!);
     return name;
+  }
+
+  void _setUI() async {
+    setState(() {
+      currentWeekKor = getWeekByKor();
+      currentTime = getDateToStringForHHMMInNow();
+      currentDay = getDateToStringForYYYYMMDDKORInNow();
+      // currentState = "";
+    });
   }
 }

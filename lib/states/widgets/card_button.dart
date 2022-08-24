@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teragate/config/colors.dart';
 import 'package:teragate/config/font-weights.dart';
 
-import 'package:teragate/states/widgets/card-square.dart';
+import 'package:teragate/states/widgets/card_square.dart';
 import 'package:teragate/states/widgets/text.dart';
 import 'package:teragate/states/widgets/icon.dart';
 

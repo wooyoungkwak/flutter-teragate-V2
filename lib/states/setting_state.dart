@@ -10,8 +10,8 @@ import 'package:teragate/config/colors.dart';
 import 'package:teragate/config/font-weights.dart';
 import 'package:teragate/config/icons.dart';
 
-import 'package:teragate/states/widgets/setting-uuid.dart';
-import 'package:teragate/states/widgets/card-button.dart';
+import 'package:teragate/states/widgets/setting_uuid.dart';
+import 'package:teragate/states/widgets/card_button.dart';
 
 import 'package:teragate/states/widgets/background.dart';
 import 'package:teragate/states/widgets/navbar.dart';

@@ -7,10 +7,11 @@ import 'package:teragate/states/widgets/text.dart';
 
 class StateRow extends StatelessWidget {
   final Widget? widget;
-
-  StateRow({
+  final String? subject;
+  const StateRow({Key? key, 
     this.widget,
-  });
+    this.subject
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +34,8 @@ class StateRow extends StatelessWidget {
                 ),
                 SizedBox(
                   child: CustomText(
-                      text: "비콘 연결 상태",
-                      size: 16,
+                      text: "$subject ",
+                      size: 20,
                       weight: TeragateFontWeight.regular,
                       color: TeragateColors.white),
                 ),

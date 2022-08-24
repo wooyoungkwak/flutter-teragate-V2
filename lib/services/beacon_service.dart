@@ -6,7 +6,6 @@ import 'package:beacons_plugin/beacons_plugin.dart';
 import 'package:teragate/config/env.dart';
 import 'package:teragate/models/storage_model.dart';
 import 'package:teragate/utils/log_util.dart';
-import 'package:teragate/utils/time_util.dart';
 
 import 'package:teragate/models/beacon_model.dart';
 
@@ -44,13 +43,13 @@ bool checkUUID(Map<String, String> uuids, dynamic event) {
   Map<String, dynamic> userMap = jsonDecode(event);
   var iBeacon = BeaconData.fromJson(userMap);
   
-  if ( iBeacon.uuid.toUpperCase() ==  "12345678-9A12-3456-789B-123456FFFFFF".toUpperCase()) {
-    return true;
-  }
-
-  // if ( iBeacon.uuid.toUpperCase() ==  "74278bdb-b644-4520-8f0c-720eeaffffff".toUpperCase()) {
+  // if ( iBeacon.uuid.toUpperCase() ==  "12345678-9A12-3456-789B-123456FFFFFF".toUpperCase()) {
   //   return true;
   // }
+
+  if ( iBeacon.uuid.toUpperCase() ==  "74278bdb-b644-4520-8f0c-720eeaffffff".toUpperCase()) {
+    return true;
+  }
 
   return false;
 }

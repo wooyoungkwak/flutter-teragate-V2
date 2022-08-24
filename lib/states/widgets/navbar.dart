@@ -4,11 +4,13 @@ class NavBar extends StatelessWidget with PreferredSizeWidget {
   final bool? isLeading;
   final bool? isActions;
   final Widget? title;
+  Function? moveLogin;
 
   NavBar({
     this.isLeading = false,
     this.isActions = false,
     this.title,
+    this.moveLogin
   });
 
   @override
@@ -44,8 +46,8 @@ class NavBar extends StatelessWidget with PreferredSizeWidget {
         ),
         child: IconButton(
           onPressed: () {
-            print('logout 확인 모달 필요');
-            Navigator.pushNamed(context, '/login');
+            // Navigator.pushNamed(context, '/login');
+            moveLogin!();
           },
           icon: const Icon(
             Icons.logout_rounded,
