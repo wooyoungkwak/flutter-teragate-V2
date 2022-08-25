@@ -18,6 +18,8 @@ import 'package:teragate/states/widgets/navbar.dart';
 import 'package:teragate/states/widgets/text.dart';
 import 'package:teragate/utils/log_util.dart';
 
+import '../utils/alarm_util.dart';
+
 class Setting extends StatefulWidget {
   final String uuid;
   final bool? switchGetIn;
@@ -76,12 +78,23 @@ class SettingState extends State<Setting> {
                 topLeft: Radius.circular(30.0),
                 topRight: Radius.circular(30.0))),
         child: Column(children: [
-          SizedBox(
-              child: CreateContainerByCardbtn(
-                  icon: TeragateIcons.business,
-                  title: "UUID",
-                  btntext: "UUID 가져오기",
-                  function: getServeruuid)),
+          GestureDetector(
+            onTap: () {
+              showConfirmDialog(context, "업무정보", "08:30 ~ 18:00");
+            },
+            child: SizedBox(
+                child: CardButton(
+                    icon: Icons.replay,
+                    title: "업무정보 동기화",
+                    function: getServeruuid)),
+          ),
+          SizedBox(height: 10.0),
+          GestureDetector(
+              onTap: () {
+                getServeruuid();
+              },
+              child: SizedBox(
+                  child: CardButton(icon: Icons.replay, title: "위치정보 동기화"))),
           SizedBox(height: 10.0),
           Flexible(child: _initListView()),
         ]));
@@ -92,7 +105,7 @@ class SettingState extends State<Setting> {
     //가져오기 값에서 다시 변경
     //GetX를 이용해서 처리 해야됨;;
     setState(() {
-      TEST_LIST_UUID.clear();
+      //TEST_LIST_UUID.clear();
       TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
       TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
       TEST_LIST_UUID.add("156165-dfgdfg-dfgdfgfd-fd123");
@@ -221,8 +234,8 @@ class SettingState extends State<Setting> {
         itemBuilder: (BuildContext context, int index) {
           return Expanded(
             child: CardButton(
-                icon: TeragateIcons.business,
-                title: " UUID ",
+                icon: Icons.location_on_sharp,
+                title: "사무실",
                 subtitle: TEST_LIST_UUID[index],
                 isSwitch: false),
           );
