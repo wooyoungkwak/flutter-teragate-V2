@@ -5,19 +5,10 @@ import 'package:teragate/models/storage_model.dart';
 import 'package:teragate/states/settingwork_state.dart';
 import 'package:teragate/config/env.dart';
 import 'package:teragate/states/login_state.dart';
-
-import 'package:teragate/config/colors.dart';
 import 'package:teragate/config/font-weights.dart';
-import 'package:teragate/config/icons.dart';
-
-import 'package:teragate/states/widgets/card_boxbtn.dart';
 import 'package:teragate/states/widgets/card_button.dart';
-
-import 'package:teragate/states/widgets/background.dart';
 import 'package:teragate/states/widgets/navbar.dart';
 import 'package:teragate/states/widgets/text.dart';
-import 'package:teragate/utils/log_util.dart';
-
 import '../utils/alarm_util.dart';
 
 class Setting extends StatefulWidget {
@@ -101,6 +92,7 @@ class SettingState extends State<Setting> {
   }
 
   void getServeruuid() {
+    // synchronizeToBeacon();
     //서버에서 가져오는 기능 넣어야됨
     //가져오기 값에서 다시 변경
     //GetX를 이용해서 처리 해야됨;;

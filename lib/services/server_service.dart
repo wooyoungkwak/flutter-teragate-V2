@@ -16,11 +16,12 @@ Future<LoginInfo> login(String id, String pw) async {
   var data = {"loginId": id, "password": pw};
   var body = json.encode(data);
 
-  var response = await http.post(Uri.parse(Env.SERVER_LOGIN_URL), headers: {"Content-Type": "application/json"}, body: body);
+  var response = await http.post(Uri.parse(Env.SERVER_LOGIN_URL),
+      headers: {"Content-Type": "application/json"}, body: body);
   if (response.statusCode == 200) {
     String result = utf8.decode(response.bodyBytes);
     Map<String, dynamic> resultMap = jsonDecode(result);
-    
+
     LoginInfo loginInfo;
 
     if (resultMap.values.first) {
@@ -40,7 +41,12 @@ Future<LoginInfo> login(String id, String pw) async {
 Future<WorkInfo> _getIn(String ip, String accessToken) async {
   var data = {"attIpIn": ip};
   var body = json.encode(data);
-  var response = await http.post(Uri.parse(Env.SERVER_GET_IN_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
+  var response = await http.post(Uri.parse(Env.SERVER_GET_IN_URL),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accessToken
+      },
+      body: body);
 
   if (response.statusCode == 200) {
     return WorkInfo.fromJson(json.decode(response.body));
@@ -53,7 +59,12 @@ Future<WorkInfo> _getIn(String ip, String accessToken) async {
 Future<WorkInfo> _getOut(String ip, String accessToken) async {
   var data = {"attIpIn": ip};
   var body = json.encode(data);
-  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
+  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accessToken
+      },
+      body: body);
 
   if (response.statusCode == 200) {
     return WorkInfo.fromJson(json.decode(response.body));
@@ -63,12 +74,16 @@ Future<WorkInfo> _getOut(String ip, String accessToken) async {
 }
 
 // beacon 동기화
-Future<List<BeaconInfoData>> _synchronizeToBeacon(String accessToken, String userId) async {
-  var data = {
-    "userId": userId
-  };
+Future<List<BeaconInfoData>> synchronizeToBeacon(
+    String accessToken, String userId) async {
+  var data = {"userId": userId};
   var body = json.encode(data);
-  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
+  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accessToken
+      },
+      body: body);
 
   if (response.statusCode == 200) {
     return BeaconInfoData.fromJsons(json.decode(response.body));
@@ -78,15 +93,21 @@ Future<List<BeaconInfoData>> _synchronizeToBeacon(String accessToken, String use
 }
 
 // 실시간 추적 정보
-Future<WorkInfo> _tracking(String accessToken, String userId, String ip, String uuid, String location) async {
+Future<WorkInfo> _tracking(String accessToken, String userId, String ip,
+    String uuid, String location) async {
   var data = {
     "attIpIn": ip,
-    "userId" : userId,
-    "uuid" : uuid,
-    "location" : location
+    "userId": userId,
+    "uuid": uuid,
+    "location": location
   };
   var body = json.encode(data);
-  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
+  final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": accessToken
+      },
+      body: body);
 
   if (response.statusCode == 200) {
     return WorkInfo.fromJson(json.decode(response.body));
@@ -99,13 +120,21 @@ Future<WorkInfo> _tracking(String accessToken, String userId, String ip, String 
 Future<TokenInfo> _getTokenByRefreshToken(String refreshToken) async {
   var data = {"refreshToken": refreshToken};
   var body = json.encode(data);
-  var response = await http.post(Uri.parse(Env.SERVER_REFRESH_TOKEN_URL), headers: {"Content-Type": "application/json"}, body: body);
+  var response = await http.post(Uri.parse(Env.SERVER_REFRESH_TOKEN_URL),
+      headers: {"Content-Type": "application/json"}, body: body);
   if (response.statusCode == 200) {
     Map<String, dynamic> data = json.decode(response.body);
     if (data[Env.KEY_LOGIN_SUCCESS]) {
-      return TokenInfo(accessToken: data[Env.KEY_ACCESS_TOKEN], refreshToken: data[Env.KEY_REFRESH_TOKEN], isUpdated: true);
+      return TokenInfo(
+          accessToken: data[Env.KEY_ACCESS_TOKEN],
+          refreshToken: data[Env.KEY_REFRESH_TOKEN],
+          isUpdated: true);
     } else {
-      return TokenInfo(accessToken: "", refreshToken: "", message: data[Env.KEY_LOGIN_SUCCESS], isUpdated: false);
+      return TokenInfo(
+          accessToken: "",
+          refreshToken: "",
+          message: data[Env.KEY_LOGIN_SUCCESS],
+          isUpdated: false);
     }
   } else {
     throw Exception(response.body);
@@ -113,22 +142,29 @@ Future<TokenInfo> _getTokenByRefreshToken(String refreshToken) async {
 }
 
 // 출근 요청 처리
-Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
+Future<WorkInfo> processGetIn(String accessToken, String refreshToken,
+    String ip, SecureStorage secureStorage, int repeat) async {
   String? isGetInCheck = await secureStorage.read(Env.KEY_GET_IN_CHECK);
   TokenInfo tokenInfo;
   WorkInfo workInfo;
 
   try {
-    if (isGetInCheck != null && isGetInCheck == getDateToStringForYYYYMMDDInNow()) {
+    if (isGetInCheck != null &&
+        isGetInCheck == getDateToStringForYYYYMMDDInNow()) {
       // 출근 처리 가 이미 된 경우
-      workInfo = WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST, work: 0);
+      workInfo =
+          WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST, work: 0);
     } else {
       workInfo = await _getIn(ip, accessToken);
 
       if (workInfo.success) {
         // 정상 등록 된 경우
-        tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
-        secureStorage.write(Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
+        tokenInfo = TokenInfo(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            isUpdated: false);
+        secureStorage.write(
+            Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
         workInfo.message = Env.MSG_GET_IN_SUCCESS;
       } else {
         if (workInfo.message == "expired") {
@@ -136,13 +172,16 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
           tokenInfo = await _getTokenByRefreshToken(refreshToken);
           // Token 저장
           secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
-          
+          secureStorage.write(
+              Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
+
           repeat++;
           if (repeat < 2) {
-            return await processGetIn(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
+            return await processGetIn(tokenInfo.getAccessToken(),
+                tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
           } else {
-            return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL, work: 0);
+            return WorkInfo(
+                success: false, message: Env.MSG_GET_IN_FAIL, work: 0);
           }
         }
       }
@@ -155,13 +194,17 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
 }
 
 // 퇴근 요청 처리
-Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
+Future<WorkInfo> processGetOut(String accessToken, String refreshToken,
+    String ip, SecureStorage secureStorage, int repeat) async {
   WorkInfo workInfo = await _getOut(ip, accessToken);
   TokenInfo tokenInfo;
 
   try {
     if (workInfo.success) {
-      tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
+      tokenInfo = TokenInfo(
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          isUpdated: false);
       secureStorage.write(Env.KEY_GET_OUT_CHECK, getDateToStringForAllInNow());
       workInfo.message = Env.MSG_GET_OUT_SUCCESS;
     } else {
@@ -172,14 +215,17 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
         if (tokenInfo.isUpdated == true) {
           // Token 저장
           secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
+          secureStorage.write(
+              Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
 
           repeat++;
           if (repeat < 2) {
-            return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
+            return await processGetOut(tokenInfo.getAccessToken(),
+                tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
           } else {
             Log.log(" ********** token expired ");
-            return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL, work: 0);
+            return WorkInfo(
+                success: false, message: Env.MSG_GET_OUT_FAIL, work: 0);
           }
         }
       }
@@ -192,14 +238,24 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
 }
 
 // 실시간 추적 처리
-Future<WorkInfo> processTracking(String accessToken, String refreshToken, String userId, String ip, String uuid, String location, SecureStorage secureStorage, int repeat) async {
-
+Future<WorkInfo> processTracking(
+    String accessToken,
+    String refreshToken,
+    String userId,
+    String ip,
+    String uuid,
+    String location,
+    SecureStorage secureStorage,
+    int repeat) async {
   WorkInfo workInfo = await _tracking(accessToken, userId, ip, uuid, location);
   TokenInfo tokenInfo;
 
   try {
     if (workInfo.success) {
-      tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
+      tokenInfo = TokenInfo(
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          isUpdated: false);
       secureStorage.write(Env.KEY_GET_OUT_CHECK, getDateToStringForAllInNow());
       workInfo.message = Env.MSG_GET_OUT_SUCCESS;
     } else {
@@ -210,11 +266,20 @@ Future<WorkInfo> processTracking(String accessToken, String refreshToken, String
         if (tokenInfo.isUpdated == true) {
           // Token 저장
           secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
+          secureStorage.write(
+              Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
 
           repeat++;
           if (repeat < 2) {
-            return await processTracking(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), userId, ip, uuid, location, secureStorage, repeat);
+            return await processTracking(
+                tokenInfo.getAccessToken(),
+                tokenInfo.getRefreshToken(),
+                userId,
+                ip,
+                uuid,
+                location,
+                secureStorage,
+                repeat);
           } else {
             return WorkInfo(success: false, message: Env.MSG_FAIL, work: 0);
           }
@@ -226,5 +291,4 @@ Future<WorkInfo> processTracking(String accessToken, String refreshToken, String
     Log.log(" processTracking Exception : ${err.toString()}");
     return WorkInfo(success: false, message: Env.MSG_FAIL, work: 0);
   }
-
 }
