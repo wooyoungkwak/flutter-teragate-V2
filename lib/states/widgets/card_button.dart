@@ -42,72 +42,69 @@ class _CardButtonState extends State<CardButton> {
 
   @override
   Widget build(BuildContext context) {
-    return CardSquare(
-      widget: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          IconBox(
-            icon: widget.icon,
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 1.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomText(
-                  text: widget.title!,
-                  weight: TeragateFontWeight.bold,
-                  color: TeragateColors.white,
-                ),
-                if (isNotEmptySubtitle)
-                  TextButton(
-                    onPressed: () {
-                      if (widget.function != null) {
-                        widget.function!(context);
-                      }
-                    },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.all(0.0),
-                    ),
-                    child: CustomText(
+    return GestureDetector(
+      onTap: () {
+        if (widget.function != null) {
+          widget.function!(context);
+        }
+      },
+      child: CardSquare(
+        widget: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            IconBox(
+              icon: widget.icon,
+            ),
+            Container(
+              margin: const EdgeInsets.only(left: 1.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomText(
+                    text: widget.title!,
+                    weight: TeragateFontWeight.bold,
+                    color: TeragateColors.white,
+                  ),
+                  if (isNotEmptySubtitle)
+                    CustomText(
                       text: widget.subtitle!,
                       size: 13,
                       weight: TeragateFontWeight.regular,
                       color: TeragateColors.grey,
                     ),
+                ],
+              ),
+            ),
+            if (widget.isSwitch!)
+              const Expanded(
+                child: Text(""),
+              ),
+            if (widget.isSwitch!)
+              Column(
+                children: [
+                  Switch(
+                    value: isSwitched,
+                    onChanged: (value) => {
+                      setState(() {
+                        isSwitched = value;
+                        alarmState = isSwitched ? "알림켜짐" : "알림꺼짐";
+                      })
+                    },
+                    activeColor: TeragateColors.white,
+                    activeTrackColor: TeragateColors.activeTrackColor,
+                    inactiveTrackColor: TeragateColors.darkGrey,
                   ),
-              ],
-            ),
-          ),
-          if (widget.isSwitch!)
-            const Expanded(
-              child: Text(""),
-            ),
-          if (widget.isSwitch!)
-            Column(
-              children: [
-                Switch(
-                  value: isSwitched,
-                  onChanged: (value) => {
-                    setState(() {
-                      isSwitched = value;
-                      alarmState = isSwitched ? "알림켜짐" : "알림꺼짐";
-                    })
-                  },
-                  activeColor: TeragateColors.white,
-                  activeTrackColor: TeragateColors.activeTrackColor,
-                  inactiveTrackColor: TeragateColors.darkGrey,
-                ),
-                CustomText(
-                  text: alarmState,
-                  size: 12.0,
-                  weight: TeragateFontWeight.medium,
-                  color: TeragateColors.grey,
-                )
-              ],
-            )
-        ],
+                  CustomText(
+                    text: alarmState,
+                    size: 12.0,
+                    weight: TeragateFontWeight.medium,
+                    color: TeragateColors.grey,
+                  )
+                ],
+              )
+          ],
+        ),
       ),
     );
   }
